@@ -120,7 +120,6 @@
       float: left;
       padding: 10px;
       background: #fff;
-      padding-bottom: 10px;
     }
 
     td.result,
@@ -131,6 +130,11 @@
     .header {
       width: 100%;
       float: left;
+    }
+
+    .header .logo {
+      max-width: 90%;
+      padding-left: 10px;
     }
 
     .summary,
@@ -190,7 +194,7 @@
       left: 0;
       border: none;
       outline: none;
-      boxShadow: none;
+      box-shadow: none;
     }
 
     @media (max-width: 500px) {
@@ -214,6 +218,8 @@
 
 <div class="feature-navigator">
   <div class="header">
+    <img class="logo" src="{{logo}}" alt="" />
+
     <h1>{{title}}</h1>
 
     <h2 class="component">{{component}}</h2>
