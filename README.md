@@ -3,4 +3,4 @@ This project is a customization of the cucumber-html-report npm package
 
 
 
-Written by Peter Leinonen 2016, with help of contributors. Thanks!
+Thanks for Peter Leinonen 2016 for the https://github.com/leinonen/cucumber-html-report package
