@@ -48,6 +48,13 @@
       <div class="report" id="F_{{id}}">
         <h2>{{keyword}}: {{name}} <span class="tags">{{tags}}</span></h2>
 
+        <div class="chart-body">
+          <div class="widget">
+            <div class="chart-header">Steps</div>
+            <div id="stepsChart" data-chart="{{stepsJson}}" class="chart-container"></div>
+          </div>
+        </div>
+
         <p class="filename">{{uri}}</p>
 
         <p class="story">{{description}}</p>
@@ -109,6 +116,7 @@
         href="http://leinonen.se">Peter Leinonen</a> 2016.</p>
     </div>
 
+    <script src="../node_modules/d3/d3.min.js" type="text/javascript"></script>
     <script src="../template_logic.js" type="text/javascript"></script>
   </body>
 </html>

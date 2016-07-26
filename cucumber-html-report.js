@@ -56,6 +56,16 @@ CucumberHtmlReport.prototype.createReport = function() {
       })
   )(features);
 
+  var scenarios = R.compose(
+      R.filter(function (element) {
+        return element.type === "scenario";
+      }),
+      R.flatten(),
+      R.map(function (feature) {
+        return feature.elements
+      })
+  )(features);
+
   //Counts the steps based on their status.
   allSteps.map(function (step) {
     switch (step.result.status) {
@@ -93,6 +103,8 @@ CucumberHtmlReport.prototype.createReport = function() {
   var mustacheOptions = Object.assign(options, {
     features: features,
     steps: steps,
+    stepsJson: JSON.stringify(steps),
+    scenariosJson: JSON.stringify(scenarios),
     summary: summary,
     image: mustacheImageFormatter,
     duration: mustacheDurationFormatter

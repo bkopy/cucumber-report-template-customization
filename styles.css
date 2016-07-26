@@ -134,6 +134,7 @@ td.result,
 }
 
 .header .logo {
+	margin: 0 auto;
 	max-width: 90%;
 	padding-left: 10px;
 }
@@ -222,5 +223,84 @@ td.result,
 		margin-top: 1em;
 		margin-left: auto;
 		width: 100%
+	}
+}
+
+.print-button {
+	background-color: transparent;
+	color: #428bca;
+	transition: all .5s;
+	display: inline-block;
+	padding: .375rem 1rem;
+	font-size: 1rem;
+	font-weight: normal;
+	line-height: 1.5;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	border: 1px solid #428bca;
+	border-radius: .25rem;
+	margin: 20px 0 0 20px;
+}
+
+.print-button:hover {
+	background-color: #428bca;
+	color: #fff;
+	border-color: #428bca;
+	text-decoration: none;
+}
+
+.print-button:focus {
+	outline: none;
+}
+
+.chart-body {
+	background-color: #1B1F2A;
+	border-radius: 5px;
+	width: 50%;
+	font-family: 'Roboto', sans-serif;
+	height: 100%;
+}
+
+.chart-header{
+	background-color: #29384D;
+	height:40px;
+	color:#929DAF;
+	text-align: center;
+	line-height: 40px;
+	border-top-left-radius: 7px;
+	border-top-right-radius: 7px;
+	font-weight: 400;
+	font-size: 1.5em;
+	text-shadow: 1px 1px #06060d;
+}
+
+.widget {
+	margin-top: 10px;
+	width: 100%;
+	background-color: #222D3A;
+	border-radius: 5px;
+	box-shadow: 0 0 1px 0 #06060d;
+}
+
+.chart-container{
+	width: 300px;
+	margin: 0 auto;
+	padding: 25px;
+}
+
+.shadow {
+	-webkit-filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5));
+	filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5));
+}
+
+@media print {
+	.print-button {
+		display: none;
 	}
 }

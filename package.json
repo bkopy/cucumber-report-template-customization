@@ -11,6 +11,7 @@
   "dependencies": {
     "atob": "^2.0.3",
     "cucumber-html-report": "^0.3.8",
+    "d3": "^3.5.5",
     "mustache": "^2.2.1",
     "ramda": "^0.21.0",
     "slug": "^0.9.1"
