@@ -1,14 +1,12 @@
-//TODO Temporary solution to the options object not yet being extensible. Once this feature is added to the original cucumber-html-report, this file can be removed.
-
 var
-  fs = require("fs"),
-  path = require("path"),
-  slug = require("slug"),
-  atob = require("atob"),
-  Mustache = require("mustache"),
-  Directory = require("./node_modules/cucumber-html-report/lib/directory.js"),
-  Summary = require("./node_modules/cucumber-html-report/lib/summary.js")
-  R = require("ramda");
+    fs = require("fs"),
+    path = require("path"),
+    slug = require("slug"),
+    atob = require("atob"),
+    Mustache = require("mustache"),
+    Directory = require("./node_modules/cucumber-html-report/lib/directory.js"),
+    Summary = require("./node_modules/cucumber-html-report/lib/summary.js"),
+    R = require("ramda");
 
 var defaultTemplate = path.join(__dirname, "templates", "default.html");
 
@@ -25,13 +23,15 @@ CucumberHtmlReport.prototype.createReport = function() {
   var features = parseFeatures(options, loadCucumberReport(this.options.source));
   var templateFile = options.template || defaultTemplate;
   var template = loadTemplate(templateFile);
-  
+
   var steps = {
     "all": 0,
     "passed": 0,
     "skipped": 0,
     "failed": 0
   };
+
+  //Extracts steps from the features.
   var allSteps = R.compose(
       R.flatten(),
       R.map(function (scenario) {
@@ -46,6 +46,7 @@ CucumberHtmlReport.prototype.createReport = function() {
       })
   )(features);
 
+  //Counts the steps based on their status.
   allSteps.map(function (step) {
     switch (step.result.status) {
       case "passed":
@@ -65,6 +66,7 @@ CucumberHtmlReport.prototype.createReport = function() {
 
   var summary = Summary.calculateSummary(features);
   console.log(summary);
+  //Replaces "OK" and "NOK" with "Passed" and "Failed".
   summary.status = summary.status === "OK" ? "passed" : "failed";
 
   var mustacheOptions = Object.assign(options, {
