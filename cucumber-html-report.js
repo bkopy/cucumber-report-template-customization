@@ -31,6 +31,16 @@ CucumberHtmlReport.prototype.createReport = function() {
     "failed": 0
   };
 
+	/**
+     * Rouds a number to the supplied decimals. Only makes sense for floats!
+     * @param number The number to round
+     * @param decimals The maximum number of decimals expected.
+     * @returns {number} The rounded number. Always returns a float!
+     */
+  var round = function (number, decimals) {
+    return Math.round(number * Math.pow(10, decimals)) / parseFloat(Math.pow(10, decimals));
+  };
+
   //Extracts steps from the features.
   var allSteps = R.compose(
       R.flatten(),
@@ -62,10 +72,21 @@ CucumberHtmlReport.prototype.createReport = function() {
         steps.failed ++;
         break;
     }
+
+    //Converts the duration from nanoseconds to seconds and minutes (if any)
+    var duration = step.result.duration;
+    if (duration && duration / 60000000000 >= 1) {
+
+      //If the test ran for more than a minute, also display minutes.
+      step.result.convertedDuration = Math.trunc(duration / 60000000000) + " m " + round((duration % 60000000000) / 1000000000, 2) + " s";
+    } else if (duration && duration / 60000000000 < 1) {
+
+      //If the test ran for less than a minute, display only seconds.
+      step.result.convertedDuration = round(duration / 1000000000, 2) + " s";
+    }
   });
 
   var summary = Summary.calculateSummary(features);
-  console.log(summary);
   //Replaces "OK" and "NOK" with "Passed" and "Failed".
   summary.status = summary.status === "OK" ? "passed" : "failed";
 
