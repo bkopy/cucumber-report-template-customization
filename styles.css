@@ -44,8 +44,14 @@ th, td {
 
 tr.failed { cursor: pointer; }
 
-tr.passed td { background-color: rgb(150, 250, 150); }
-tr.failed td { background-color: rgb(250, 150, 150); }
+tr.passed td,
+.summary .passed {
+	background-color: rgb(150, 250, 150);
+}
+tr.failed td,
+.summary .failed {
+	background-color: rgb(250, 150, 150);
+}
 
 td.status {
 	text-transform: capitalize;
@@ -115,7 +121,6 @@ div.report {
 	float: left;
 	padding: 10px;
 	background: #fff;
-	padding-bottom: 10px;
 }
 
 td.result,
