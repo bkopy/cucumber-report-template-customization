@@ -62,11 +62,15 @@ CucumberHtmlReport.prototype.createReport = function() {
         break;
     }
   });
-  
+
+  var summary = Summary.calculateSummary(features);
+  console.log(summary);
+  summary.status = summary.status === "OK" ? "passed" : "failed";
+
   var mustacheOptions = Object.assign(options, {
     features: features,
     steps: steps,
-    summary: Summary.calculateSummary(features),
+    summary: summary,
     image: mustacheImageFormatter,
     duration: mustacheDurationFormatter
   });

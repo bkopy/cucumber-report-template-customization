@@ -174,8 +174,16 @@ td.result,
 .scenario-list > li.passed a { color: #999; }
 .scenario-list > li.failed a { color: rgb(250, 150, 150); }
 
-.summary span.OK  { color: rgb(150, 250, 150); }
-.summary span.NOK { color: rgb(250, 150, 150); }
+.summary span.passed  {
+	color: rgb(150, 250, 150);
+	background-color: transparent;
+	text-transform: capitalize;
+}
+.summary span.failed {
+	color: rgb(250, 150, 150);
+	background-color: transparent;
+	text-transform: capitalize;
+}
 
 .footer {
 	color: #3C494C;
