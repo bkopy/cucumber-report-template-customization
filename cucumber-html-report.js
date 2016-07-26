@@ -7,7 +7,8 @@ var
   atob = require("atob"),
   Mustache = require("mustache"),
   Directory = require("./node_modules/cucumber-html-report/lib/directory.js"),
-  Summary = require("./node_modules/cucumber-html-report/lib/summary.js");
+  Summary = require("./node_modules/cucumber-html-report/lib/summary.js")
+  R = require("ramda");
 
 var defaultTemplate = path.join(__dirname, "templates", "default.html");
 
@@ -24,8 +25,47 @@ CucumberHtmlReport.prototype.createReport = function() {
   var features = parseFeatures(options, loadCucumberReport(this.options.source));
   var templateFile = options.template || defaultTemplate;
   var template = loadTemplate(templateFile);
+  
+  var steps = {
+    "all": 0,
+    "passed": 0,
+    "skipped": 0,
+    "failed": 0
+  };
+  var allSteps = R.compose(
+      R.flatten(),
+      R.map(function (scenario) {
+        return scenario.steps;
+      }),
+      R.filter(function (element) {
+        return element.type === "scenario";
+      }),
+      R.flatten(),
+      R.map(function (feature) {
+        return feature.elements
+      })
+  )(features);
+
+  allSteps.map(function (step) {
+    switch (step.result.status) {
+      case "passed":
+        steps.all ++;
+        steps.passed ++;
+        break;
+      case "skipped":
+        steps.all ++;
+        steps.skipped ++;
+        break;
+      case "failed":
+        steps.all ++;
+        steps.failed ++;
+        break;
+    }
+  });
+  
   var mustacheOptions = Object.assign(options, {
     features: features,
+    steps: steps,
     summary: Summary.calculateSummary(features),
     image: mustacheImageFormatter,
     duration: mustacheDurationFormatter
