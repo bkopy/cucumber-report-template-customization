@@ -1,13 +1,12 @@
-//TODO Temporary solution to the options object not yet being extensible. Once this feature is added to the original cucumber-html-report, this file can be removed.
-
 var
-  fs = require("fs"),
-  path = require("path"),
-  slug = require("slug"),
-  atob = require("atob"),
-  Mustache = require("mustache"),
-  Directory = require("./node_modules/cucumber-html-report/lib/directory.js"),
-  Summary = require("./node_modules/cucumber-html-report/lib/summary.js");
+    fs = require("fs"),
+    path = require("path"),
+    slug = require("slug"),
+    atob = require("atob"),
+    Mustache = require("mustache"),
+    Directory = require("./node_modules/cucumber-html-report/lib/directory.js"),
+    Summary = require("./node_modules/cucumber-html-report/lib/summary.js"),
+    R = require("ramda");
 
 var defaultTemplate = path.join(__dirname, "templates", "default.html");
 
@@ -24,9 +23,89 @@ CucumberHtmlReport.prototype.createReport = function() {
   var features = parseFeatures(options, loadCucumberReport(this.options.source));
   var templateFile = options.template || defaultTemplate;
   var template = loadTemplate(templateFile);
+
+  var steps = {
+    "all": 0,
+    "passed": 0,
+    "skipped": 0,
+    "failed": 0
+  };
+
+	/**
+     * Rouds a number to the supplied decimals. Only makes sense for floats!
+     * @param number The number to round
+     * @param decimals The maximum number of decimals expected.
+     * @returns {number} The rounded number. Always returns a float!
+     */
+  var round = function (number, decimals) {
+    return Math.round(number * Math.pow(10, decimals)) / parseFloat(Math.pow(10, decimals));
+  };
+
+  //Extracts steps from the features.
+  var allSteps = R.compose(
+      R.flatten(),
+      R.map(function (scenario) {
+        return scenario.steps;
+      }),
+      R.filter(function (element) {
+        return element.type === "scenario";
+      }),
+      R.flatten(),
+      R.map(function (feature) {
+        return feature.elements
+      })
+  )(features);
+
+  var scenarios = R.compose(
+      R.filter(function (element) {
+        return element.type === "scenario";
+      }),
+      R.flatten(),
+      R.map(function (feature) {
+        return feature.elements
+      })
+  )(features);
+
+  //Counts the steps based on their status.
+  allSteps.map(function (step) {
+    switch (step.result.status) {
+      case "passed":
+        steps.all ++;
+        steps.passed ++;
+        break;
+      case "skipped":
+        steps.all ++;
+        steps.skipped ++;
+        break;
+      case "failed":
+        steps.all ++;
+        steps.failed ++;
+        break;
+    }
+
+    //Converts the duration from nanoseconds to seconds and minutes (if any)
+    var duration = step.result.duration;
+    if (duration && duration / 60000000000 >= 1) {
+
+      //If the test ran for more than a minute, also display minutes.
+      step.result.convertedDuration = Math.trunc(duration / 60000000000) + " m " + round((duration % 60000000000) / 1000000000, 2) + " s";
+    } else if (duration && duration / 60000000000 < 1) {
+
+      //If the test ran for less than a minute, display only seconds.
+      step.result.convertedDuration = round(duration / 1000000000, 2) + " s";
+    }
+  });
+
+  var summary = Summary.calculateSummary(features);
+  //Replaces "OK" and "NOK" with "Passed" and "Failed".
+  summary.status = summary.status === "OK" ? "passed" : "failed";
+
   var mustacheOptions = Object.assign(options, {
     features: features,
-    summary: Summary.calculateSummary(features),
+    steps: steps,
+    stepsJson: JSON.stringify(steps),
+    scenariosJson: JSON.stringify(scenarios),
+    summary: summary,
     image: mustacheImageFormatter,
     duration: mustacheDurationFormatter
   });
