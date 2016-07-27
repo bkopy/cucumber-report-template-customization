@@ -259,6 +259,44 @@ td.result,
 	outline: none;
 }
 
+@media print {
+	.print-button {
+		display: none;
+	}
+}
+.print-button {
+	background-color: transparent;
+	color: #428bca;
+	transition: all .5s;
+	display: inline-block;
+	padding: .375rem 1rem;
+	font-size: 1rem;
+	font-weight: normal;
+	line-height: 1.5;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	border: 1px solid #428bca;
+	border-radius: .25rem;
+	margin: 20px 0 0 20px;
+}
+
+.print-button:hover {
+	background-color: #428bca;
+	color: #fff;
+	border-color: #428bca;
+	text-decoration: none;
+}
+
+.print-button:focus {
+	outline: none;
+}
+
 .chart-body {
 	background-color: #1B1F2A;
 	border-radius: 5px;
