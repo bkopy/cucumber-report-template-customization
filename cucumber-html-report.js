@@ -8,6 +8,16 @@ var
     Summary = require("./node_modules/cucumber-html-report/lib/summary.js"),
     R = require("ramda");
 
+/**
+ * Rouds a number to the supplied decimals. Only makes sense for floats!
+ * @param decimals The maximum number of decimals expected.
+ * @param number The number to round.
+ * @returns {number} The rounded number. Always returns a float!
+ */
+var round = function (decimals, number) {
+  return Math.round(number * Math.pow(10, decimals)) / parseFloat(Math.pow(10, decimals));
+};
+
 var defaultTemplate = path.join(__dirname, "templates", "default.html");
 
 var CucumberHtmlReport = module.exports = function(options) {
@@ -21,60 +31,110 @@ CucumberHtmlReport.prototype.createReport = function() {
   }
 
   var features = parseFeatures(options, loadCucumberReport(this.options.source));
+  R.map(function (feature) {
+    var duration = R.compose(
+      R.reduce(function (accumulator, current) {
+        return accumulator + current;
+      }, 0),
+      R.flatten(),
+      R.map(function (step) {
+        return step.result.duration ? step.result.duration : 0;
+      }),
+      R.flatten(),
+      R.map(function (element) {
+        return element.steps;
+      })
+    )(feature.elements);
+
+    if (duration && duration / 60000000000 >= 1) {
+
+      //If the test ran for more than a minute, also display minutes.
+      feature.duration = Math.trunc(duration / 60000000000) + " m " + round(2, (duration % 60000000000) / 1000000000) + " s";
+    } else if (duration && duration / 60000000000 < 1) {
+
+      //If the test ran for less than a minute, display only seconds.
+      feature.duration = round(2, duration / 1000000000) + " s";
+    }
+    
+  })(features);
+
   var templateFile = options.template || defaultTemplate;
   var template = loadTemplate(templateFile);
 
-  var stepsSummary = {
-    "all": 0,
-    "passed": 0,
-    "skipped": 0,
-    "failed": 0
-  };
-
-	/**
-     * Rouds a number to the supplied decimals. Only makes sense for floats!
-     * @param number The number to round
-     * @param decimals The maximum number of decimals expected.
-     * @returns {number} The rounded number. Always returns a float!
-     */
-  var round = function (number, decimals) {
-    return Math.round(number * Math.pow(10, decimals)) / parseFloat(Math.pow(10, decimals));
-  };
+  var stepsSummary = [];
+  var scenarios = [];
 
   //Extracts steps from the features.
-  var allSteps = R.compose(
-      R.flatten(),
-      R.map(function (scenario) {
-        return scenario.steps;
-      }),
-      R.filter(function (element) {
-        return element.type === "scenario";
-      }),
-      R.flatten(),
-      R.map(function (feature) {
-        return feature.elements
-      })
-  )(features);
+  features.map(function (feature, index) {
+    feature.index = index;
+    var steps = R.compose(
+        R.flatten(),
+        R.map(function (scenario) {
+          return scenario.steps;
+        }),
+        R.filter(function (element) {
+          return element.type === "scenario";
+        })
+    )(feature.elements);
+    
+    stepsSummary.push({
+      "all": 0,
+      "passed": 0,
+      "skipped": 0,
+      "failed": 0
+    });
 
-  var scenarios = {
-    all: 0,
-    passed: 0,
-    failed: 0
-  };
+    //Counts the steps based on their status.
+    steps.map(function (step) {
+      switch (step.result.status) {
+        case "passed":
+          stepsSummary[index].all++;
+          stepsSummary[index].passed++;
+          break;
+        case "skipped":
+          stepsSummary[index].all++;
+          stepsSummary[index].skipped++;
+          break;
+        default:
+          stepsSummary[index].all++;
+          stepsSummary[index].failed++;
+          break;
+      }
 
-  R.compose(
-      R.map(function (scenario) {
-        scenarios.all++;
-        scenario.status === "passed" ? scenarios.passed++ : scenarios.failed++;
-      }),
-      R.filter(function (element) {
-        return element.type === "scenario";
-      }),
-      R.flatten(),
-      R.map(function (feature) {
-        return feature.elements
-      })
-  )(features);
+      //Converts the duration from nanoseconds to seconds and minutes (if any)
+      var duration = step.result.duration;
+      if (duration && duration / 60000000000 >= 1) {
+
+        //If the test ran for more than a minute, also display minutes.
+        step.result.convertedDuration = Math.trunc(duration / 60000000000) + " m " + round(2, (duration % 60000000000) / 1000000000) + " s";
+      } else if (duration && duration / 60000000000 < 1) {
+
+        //If the test ran for less than a minute, display only seconds.
+        step.result.convertedDuration = round(2, duration / 1000000000) + " s";
+      }
+    });
+
+    scenarios.push({
+      all: 0,
+      passed: 0,
+      failed: 0
+    });
+
+    R.compose(
+        R.map(function (status) {
+          scenarios[index].all++;
+          scenarios[index][status]++;
+        }),
+        R.flatten(),
+        R.map(function (scenario) {
+          return scenario.status;
+        }),
+        R.filter(function (element) {
+          return element.type === "scenario";
+        })
+    )(feature.elements);
+
+  });
 
   var scenariosSummary = R.compose(
       R.filter(function (element) {
@@ -85,37 +145,6 @@ CucumberHtmlReport.prototype.createReport = function() {
         return feature.elements
       })
   )(features);
-
-
-  //Counts the steps based on their status.
-  allSteps.map(function (step) {
-    switch (step.result.status) {
-      case "passed":
-        stepsSummary.all ++;
-        stepsSummary.passed ++;
-        break;
-      case "skipped":
-        stepsSummary.all ++;
-        stepsSummary.skipped ++;
-        break;
-      case "failed":
-        stepsSummary.all ++;
-        stepsSummary.failed ++;
-        break;
-    }
-
-    //Converts the duration from nanoseconds to seconds and minutes (if any)
-    var duration = step.result.duration;
-    if (duration && duration / 60000000000 >= 1) {
-
-      //If the test ran for more than a minute, also display minutes.
-      step.result.convertedDuration = Math.trunc(duration / 60000000000) + " m " + round((duration % 60000000000) / 1000000000, 2) + " s";
-    } else if (duration && duration / 60000000000 < 1) {
-
-      //If the test ran for less than a minute, display only seconds.
-      step.result.convertedDuration = round(duration / 1000000000, 2) + " s";
-    }
-  });
 
   var summary = Summary.calculateSummary(features);
   //Replaces "OK" and "NOK" with "Passed" and "Failed".
