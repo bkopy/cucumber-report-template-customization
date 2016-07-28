@@ -298,32 +298,29 @@ td.result,
 }
 
 .chart-body {
-	background-color: #1B1F2A;
 	border-radius: 5px;
-	width: 50%;
+	color: #000000;
+	display: inline-block;
+	width: 48%;
 	font-family: 'Roboto', sans-serif;
 	height: 100%;
 }
 
 .chart-header{
-	background-color: #29384D;
 	height:40px;
-	color:#929DAF;
+	color: #000000;
 	text-align: center;
 	line-height: 40px;
 	border-top-left-radius: 7px;
 	border-top-right-radius: 7px;
 	font-weight: 400;
 	font-size: 1.5em;
-	text-shadow: 1px 1px #06060d;
 }
 
 .widget {
 	margin-top: 10px;
 	width: 100%;
-	background-color: #222D3A;
 	border-radius: 5px;
-	box-shadow: 0 0 1px 0 #06060d;
 }
 
 .chart-container{
@@ -332,10 +329,10 @@ td.result,
 	padding: 25px;
 }
 
-.shadow {
+/*.shadow {
 	-webkit-filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5));
 	filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5));
-}
+}*/
 
 @media print {
 	.print-button {

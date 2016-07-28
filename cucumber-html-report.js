@@ -24,7 +24,7 @@ CucumberHtmlReport.prototype.createReport = function() {
   var templateFile = options.template || defaultTemplate;
   var template = loadTemplate(templateFile);
 
-  var steps = {
+  var stepsSummary = {
     "all": 0,
     "passed": 0,
     "skipped": 0,
@@ -56,7 +56,17 @@ CucumberHtmlReport.prototype.createReport = function() {
       })
   )(features);
 
-  var scenarios = R.compose(
+  var scenarios = {
+    all: 0,
+    passed: 0,
+    failed: 0
+  };
+
+  R.compose(
+      R.map(function (scenario) {
+        scenarios.all++;
+        scenario.status === "passed" ? scenarios.passed++ : scenarios.failed++;
+      }),
       R.filter(function (element) {
         return element.type === "scenario";
       }),
@@ -66,20 +76,31 @@ CucumberHtmlReport.prototype.createReport = function() {
       })
   )(features);
 
+  var scenariosSummary = R.compose(
+      R.filter(function (element) {
+        return element.type === "scenario";
+      }),
+      R.flatten(),
+      R.map(function (feature) {
+        return feature.elements
+      })
+  )(features);
+
+
   //Counts the steps based on their status.
   allSteps.map(function (step) {
     switch (step.result.status) {
       case "passed":
-        steps.all ++;
-        steps.passed ++;
+        stepsSummary.all ++;
+        stepsSummary.passed ++;
         break;
       case "skipped":
-        steps.all ++;
-        steps.skipped ++;
+        stepsSummary.all ++;
+        stepsSummary.skipped ++;
         break;
       case "failed":
-        steps.all ++;
-        steps.failed ++;
+        stepsSummary.all ++;
+        stepsSummary.failed ++;
         break;
     }
 
@@ -102,8 +123,10 @@ CucumberHtmlReport.prototype.createReport = function() {
 
   var mustacheOptions = Object.assign(options, {
     features: features,
-    steps: steps,
-    stepsJson: JSON.stringify(steps),
+    stepsSummary: stepsSummary,
+    scenariosSummary: JSON.stringify(scenariosSummary),
+    stepsJson: JSON.stringify(stepsSummary),
+    scenarios: scenarios,
     scenariosJson: JSON.stringify(scenarios),
     summary: summary,
     image: mustacheImageFormatter,
