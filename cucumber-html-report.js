@@ -18,6 +18,11 @@ var round = function (decimals, number) {
   return Math.round(number * Math.pow(10, decimals)) / parseFloat(Math.pow(10, decimals));
 };
 
+function getDataUri(file) {
+  var bitmap = fs.readFileSync(file);
+  return new Buffer(bitmap).toString("base64");
+}
+
 var defaultTemplate = path.join(__dirname, "templates", "default.html");
 
 var CucumberHtmlReport = module.exports = function(options) {
@@ -150,6 +155,23 @@ CucumberHtmlReport.prototype.createReport = function() {
   //Replaces "OK" and "NOK" with "Passed" and "Failed".
   summary.status = summary.status === "OK" ? "passed" : "failed";
 
+  var logo = "data:image/svg+xml;base64," + getDataUri(options.logo);
+  var screenshots = fs.readdirSync("./screenshots").map(function (file) {
+    if (file[0] === ".") {
+      return undefined;
+    }
+
+    var name = file.split(".");
+    var extension = name.pop();
+    extension === "svg" ? extension = "svg+xml" : false;
+    return {
+      name: name.join("."),
+      url: "data:image/" + extension + ";base64," + getDataUri("./screenshots/" + file)
+    };
+  }).filter(function (image) {
+    return image;
+  });
+
   var mustacheOptions = Object.assign(options, {
     features: features,
     stepsSummary: stepsSummary,
@@ -158,6 +180,8 @@ CucumberHtmlReport.prototype.createReport = function() {
     scenarios: scenarios,
     scenariosJson: JSON.stringify(scenarios),
     summary: summary,
+    logo: logo,
+    screenshots: screenshots,
     image: mustacheImageFormatter,
     duration: mustacheDurationFormatter
   });
