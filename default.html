@@ -52,14 +52,14 @@
 
         <div class="chart-body">
           <div class="widget">
-            <div class="chart-header">Steps ({{stepsSummary.all}})</div>
+            <div class="chart-header">Steps (Total: {{stepsSummary.all}})</div>
             <div id="stepsChart" data-chart="{{stepsJson}}" class="chart-container"></div>
           </div>
         </div>
 
         <div class="chart-body">
           <div class="widget">
-            <div class="chart-header">Scenarios ({{scenarios.all}})</div>
+            <div class="chart-header">Scenarios (Total: {{scenarios.all}})</div>
             <div id="scenariosChart" data-chart="{{scenariosJson}}" class="chart-container"></div>
           </div>
         </div>
@@ -77,7 +77,7 @@
 
         <div class="chart-body">
           <div class="widget">
-            <div class="chart-header">Steps</div>
+            <div class="chart-header bar-chart"></div>
             <div id="stepsBarChart" data-chart="{{scenariosSummary}}" class="chart-container"></div>
           </div>
         </div>

@@ -158,10 +158,12 @@ var createDonutChart = function (dataSet, colourRange, chartSelector) {
 			.attr("width", legendRectSize)
 			.attr("height", legendRectSize)
 			.style("fill", function (d) {
-				return d.color;
+				var darkened = d3.hsl(d.color);
+				return d3.hsl((darkened.h + 5), (darkened.s - 0.07), (darkened.l - 0.15));
 			})
 			.style("stroke", function (d) {
-				return d.color;
+				var darkened = d3.hsl(d.color);
+				return d3.hsl((darkened.h + 5), (darkened.s - 0.07), (darkened.l - 0.15));
 			});
 		legend.append("text")
 			.attr("x", legendRectSize + legendSpacing)
@@ -237,7 +239,7 @@ var createBarChart = function (dataSet, chartSelector) {
 
 	var svg = d3.select(chartSelector)
 		.append("svg")
-		.attr("width", width)
+		.attr("width", width + 130)
 		.attr("height", height);
 
 	svg.selectAll("rect")
@@ -292,6 +294,37 @@ var createBarChart = function (dataSet, chartSelector) {
 
 			return height - (d.count / total) * height * 0.9;
 		});
+	
+	var legendRectSize = 18;
+	var legendSpacing = 4;
+	var legend = svg.selectAll(".legend")
+		.data(dataSet)
+		.enter()
+		.append("g")
+		.attr("class", "legend")
+		.attr("transform", function(d, i) {
+			var height = legendRectSize + legendSpacing;
+			var y = i * height;
+			return "translate(" + 320 + "," + y + ")";
+		});
+
+	legend.append("rect")
+		.attr("width", legendRectSize)
+		.attr("height", legendRectSize)
+		.style("fill", function (d) {
+			var darkened = d3.hsl(d.color);
+			return d3.hsl((darkened.h + 5), (darkened.s - 0.07), (darkened.l - 0.15));
+		})
+		.style("stroke", function (d) {
+			var darkened = d3.hsl(d.color);
+			return d3.hsl((darkened.h + 5), (darkened.s - 0.07), (darkened.l - 0.15));
+		});
+	legend.append("text")
+		.attr("x", legendRectSize + legendSpacing)
+		.attr("y", legendRectSize - legendSpacing)
+		.text(function (d) {
+			return d.name + " (" + d.count + ")";
+		});
 };
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -320,6 +353,8 @@ document.addEventListener("DOMContentLoaded", function () {
 			previous["all"]++;
 			return previous;
 		}, {passed: 0, skipped: 0, failed: 0, all: 0});
+
+		document.getElementsByClassName("chart-header bar-chart")[index].innerHTML = "Steps (Total: " + stepsBarData.all + ")";
 
 		createBarChart([
 			{ name: "Passing", count: stepsBarData.passed, color: "#96FA96" },
