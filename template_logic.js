@@ -18,7 +18,7 @@
 
 	var failed = document.getElementsByClassName("failed");
 	for (var i = 0; i < failed.length; i += 1) {
-		if (failed[i].className === "failed") {
+		if (failed[i].className === "failed" && !failed[i].classList.contains("hidden")) {
 			failed[i].addEventListener("click", (function(i) {
 				return function() {
 					if (failed[i].nextElementSibling.classList.contains("hidden")) {
@@ -31,10 +31,11 @@
 			})(i));
 		}
 		else if (failed[i].classList.contains("hidden")) {
-			console.log("elif here");
-			failed[i].addEventListener("click", (function(i) {
+			var children = failed[i].children;
+			Array.prototype.filter.call(children, function (child) {
+				return child.classList.contains("trace");
+			})[0].addEventListener("click", (function (i) {
 				return function() {
-					console.log("im here now");
 					if (failed[i].classList.contains("hidden")) {
 						failed[i].classList.remove("hidden");
 					} else {
@@ -257,7 +258,7 @@ var createBarChart = function (dataSet, chartSelector) {
 
 			return height - (d.count / total) * height * 0.9;
 		})
-		.attr("width", width / dataSet.length - barPadding)
+		.attr("width", width / dataSet.length - (barPadding + 10))
 		.attr("height", function(d) {
 			var total = 0;
 			for (var i = 0; i < dataSet.length; i++) {
@@ -269,6 +270,35 @@ var createBarChart = function (dataSet, chartSelector) {
 		.attr("fill", function(d) {
 			var color = d3.hsl(d.color);
 			return d3.hsl((color.h + 5), (color.s - 0.07), (color.l - 0.15));
+		});
+	
+	svg.selectAll(".rect-shadow")
+		.data(dataSet)
+		.enter()
+		.append("rect")
+		.attr("x", function(d, i) {
+			return (i * width / dataSet.length) + (width / dataSet.length - barPadding * 2);
+		})
+		.attr("y", function(d) {
+			var total = 0;
+			for (var i = 0; i < dataSet.length; i++) {
+				total += dataSet[i].count;
+			}
+
+			return height - (d.count / total) * height * 0.9;
+		})
+		.attr("width", 10)
+		.attr("height", function(d) {
+			var total = 0;
+			for (var i = 0; i < dataSet.length; i++) {
+				total += dataSet[i].count;
+			}
+			
+			return (d.count / total) * height * 0.9;
+		})
+		.attr("fill", function(d) {
+			var color = d3.hsl(d.color);
+			return d3.hsl((color.h + 10), (color.s - 0.14), (color.l - 0.3));
 		});
 
 	svg.selectAll("text")
@@ -284,7 +314,7 @@ var createBarChart = function (dataSet, chartSelector) {
 			return round((d.count / total) * 100, 2) + "%";
 		})
 		.attr("x", function(d, i) {
-			return (i * width / dataSet.length) + ((width / dataSet.length - barPadding) * 0.35);
+			return (i * width / dataSet.length) + ((width / dataSet.length - barPadding) * 0.20);
 		})
 		.attr("y", function(d) {
 			var total = 0;
@@ -377,5 +407,12 @@ document.addEventListener("DOMContentLoaded", function () {
 			{ name: "Skipped", count: stepsBarData.skipped, color: "#FAFA96" }
 		], "#stepsBarChart" + index);
 
+	});
+
+	var screenshotLinks = document.getElementsByClassName("screenshot-link");
+	Array.prototype.forEach.call(screenshotLinks, function (failure) {
+		var index = failure.getAttribute("data-index");
+		var href = JSON.parse(failure.getAttribute("data-features"))[index].replace(/\s/g, "_");
+		failure.innerHTML = "<a href='#" + href + "'>Screenshot</a>"
 	});
 });

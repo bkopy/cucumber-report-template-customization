@@ -165,7 +165,7 @@ CucumberHtmlReport.prototype.createReport = function() {
     var extension = name.pop();
     extension === "svg" ? extension = "svg+xml" : false;
     return {
-      name: name.join("."),
+      name: name.join(".").replace(/\s/, "_"),
       url: "data:image/" + extension + ";base64," + getDataUri("./screenshots/" + file)
     };
   }).filter(function (image) {
@@ -174,6 +174,7 @@ CucumberHtmlReport.prototype.createReport = function() {
 
   var mustacheOptions = Object.assign(options, {
     features: features,
+    featuresJson: JSON.stringify(R.pluck("name", scenariosSummary)),
     stepsSummary: stepsSummary,
     scenariosSummary: JSON.stringify(scenariosSummary),
     stepsJson: JSON.stringify(stepsSummary),

@@ -367,6 +367,11 @@ tr td.skipped,
 	padding: 10px;
 }
 
+.screenshot-link a {
+	text-decoration: underline;
+	color: #0000ff;
+}
+
 @media print {
 	.print-button {
 		display: none;
