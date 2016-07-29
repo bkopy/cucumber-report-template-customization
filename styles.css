@@ -44,11 +44,15 @@ th, td {
 
 tr.failed { cursor: pointer; }
 
-tr.passed td,
+tr td.passed,
+.passed,
+tr.passed,
 .summary .passed {
 	background-color: rgb(150, 250, 150);
 }
-tr.failed td,
+
+tr td.failed,
+tr.failed,
 .summary .failed {
 	background-color: rgb(250, 150, 150);
 }
@@ -180,6 +184,7 @@ td.result,
 	background-color: transparent;
 	text-transform: capitalize;
 }
+
 .summary span.failed {
 	color: rgb(250, 150, 150);
 	background-color: transparent;
@@ -207,8 +212,9 @@ td.result,
 	box-shadow: none;
 }
 
+tr td.skipped,
 .skipped {
-	background-color: rgb(250,250,150);
+	background-color: rgb(250, 250, 150);
 }
 
 @media (max-width: 500px) {
@@ -334,8 +340,39 @@ td.result,
 	filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5));
 }*/
 
+.summary-table .main-header th,
+.summary-table .sub-header th:nth-child(2),
+.summary-table table tr td:nth-child(2),
+.summary-table .sub-header th:nth-child(5),
+.summary-table table tr td:nth-child(5),
+.summary-table .sub-header th:nth-child(9),
+.summary-table table tr td:nth-child(9) {
+	border-left: 1px solid #999999;
+}
+
+.summary-table .main-header th:first-child {
+	border-left: none;
+}
+
+.screenshots {
+	display: block;
+	position: relative;
+	margin-top: 60px;
+	margin-left: 20%;
+	max-width: 75%;
+	float: left;
+}
+
+.screenshots .image-container {
+	padding: 10px;
+}
+
 @media print {
 	.print-button {
 		display: none;
+	}
+
+	.hidden.failed {
+		display: table-row;
 	}
 }
