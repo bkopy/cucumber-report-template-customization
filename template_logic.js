@@ -225,14 +225,6 @@ var createDonutChart = function (dataSet, colourRange, chartSelector) {
 	restOfTheData();
 };
 
-var genNumber = (function () {
-	var counter = 0;
-
-	return function () {
-		return counter++;
-	};
-})();
-
 var createBarChart = function (dataSet, chartSelector) {
 	var width = 300;
 	var height = 250;
