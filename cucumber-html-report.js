@@ -179,6 +179,7 @@ CucumberHtmlReport.prototype.createReport = function() {
 
       if (!(tag in tags)) {
         tags[tag] = {
+          name: tag,
           scenarios: {
             all: 0,
             passed: 0,
@@ -202,7 +203,9 @@ CucumberHtmlReport.prototype.createReport = function() {
         }
         
         element.steps.map(function (step) {
-          tags[tag].duration += step.result.duration;
+          if (step.result.duration) {
+            tags[tag].duration += step.result.duration;
+          }
           tags[tag].steps.all++;
           tags[tag].steps[step.result.status]++;
         });
@@ -213,6 +216,31 @@ CucumberHtmlReport.prototype.createReport = function() {
       }
     })
   });
+  
+  var tagsArray = (function (tags) {
+    var array = [];
+    
+    for (var tag in tags) {
+      if (tags.hasOwnProperty(tag)) {
+        
+        //Converts the duration from nanoseconds to seconds and minutes (if any)
+        var duration = tags[tag].duration;
+        if (duration && duration / 60000000000 >= 1) {
+
+          //If the test ran for more than a minute, also display minutes.
+          tags[tag].duration = Math.trunc(duration / 60000000000) + " m " + round(2, (duration % 60000000000) / 1000000000) + " s";
+        } else if (duration && duration / 60000000000 < 1) {
+
+          //If the test ran for less than a minute, display only seconds.
+          tags[tag].duration = round(2, duration / 1000000000) + " s";
+        }
+        
+        array.push(tags[tag]);
+      }
+    }
+    
+    return array;
+  })(tags);
 
   var mustacheOptions = Object.assign(options, {
     features: features,
@@ -225,7 +253,8 @@ CucumberHtmlReport.prototype.createReport = function() {
     summary: summary,
     logo: logo,
     screenshots: screenshots,
-    tags: tags,
+    tags: tagsArray,
+    tagsJson: JSON.stringify(tagsArray),
     image: mustacheImageFormatter,
     duration: mustacheDurationFormatter
   });
