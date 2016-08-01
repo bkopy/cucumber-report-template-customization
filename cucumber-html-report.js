@@ -1,12 +1,12 @@
 var
-    fs = require("fs"),
-    path = require("path"),
-    slug = require("slug"),
-    atob = require("atob"),
-    Mustache = require("mustache"),
-    Directory = require("./node_modules/cucumber-html-report/lib/directory.js"),
-    Summary = require("./node_modules/cucumber-html-report/lib/summary.js"),
-    R = require("ramda");
+  fs = require("fs"),
+  path = require("path"),
+  slug = require("slug"),
+  atob = require("atob"),
+  Mustache = require("mustache"),
+  Directory = require("./node_modules/cucumber-html-report/lib/directory.js"),
+  Summary = require("./node_modules/cucumber-html-report/lib/summary.js"),
+  R = require("ramda");
 
 /**
  * Rouds a number to the supplied decimals. Only makes sense for floats!
@@ -126,17 +126,17 @@ CucumberHtmlReport.prototype.createReport = function() {
     });
 
     R.compose(
-        R.map(function (status) {
-          scenarios[index].all++;
-          scenarios[index][status]++;
-        }),
-        R.flatten(),
-        R.map(function (scenario) {
-          return scenario.status;
-        }),
-        R.filter(function (element) {
-          return element.type === "scenario";
-        })
+      R.map(function (status) {
+        scenarios[index].all++;
+        scenarios[index][status]++;
+      }),
+      R.flatten(),
+      R.map(function (scenario) {
+        return scenario.status;
+      }),
+      R.filter(function (element) {
+        return element.type === "scenario";
+      })
     )(feature.elements);
 
   });
@@ -172,6 +172,48 @@ CucumberHtmlReport.prototype.createReport = function() {
     return image;
   });
 
+  var tags = {};
+  features.map(function (feature) {
+
+    [].concat(feature.tags).map(function (tag) {
+
+      if (!(tag in tags)) {
+        tags[tag] = {
+          scenarios: {
+            all: 0,
+            passed: 0,
+            failed: 0
+          },
+          steps: {
+            all: 0,
+            passed: 0,
+            failed: 0,
+            skipped: 0
+          },
+          duration: 0,
+          status: "passed"
+        };
+      }
+
+      feature.elements.map(function (element) {
+        if (element.type === "scenario") {
+          tags[tag].scenarios.all++;
+          tags[tag].scenarios[element.status]++;
+        }
+        
+        element.steps.map(function (step) {
+          tags[tag].duration += step.result.duration;
+          tags[tag].steps.all++;
+          tags[tag].steps[step.result.status]++;
+        });
+      });
+
+      if(tags[tag].scenarios.failed > 0) {
+        tags[tag].status = "failed";
+      }
+    })
+  });
+
   var mustacheOptions = Object.assign(options, {
     features: features,
     featuresJson: JSON.stringify(R.pluck("name", scenariosSummary)),
@@ -183,6 +225,7 @@ CucumberHtmlReport.prototype.createReport = function() {
     summary: summary,
     logo: logo,
     screenshots: screenshots,
+    tags: tags,
     image: mustacheImageFormatter,
     duration: mustacheDurationFormatter
   });

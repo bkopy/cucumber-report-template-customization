@@ -115,7 +115,7 @@ var createDonutChart = function (dataSet, colourRange, chartSelector) {
 			.each(function (d) {
 				var firstArcSection = /(^.+?)L/;
 
-				var newArc = firstArcSection.exec(d3.select(this).attr("d"))[1];
+				var newArc = firstArcSection.exec(d3.select(this).attr("d")) ? firstArcSection.exec(d3.select(this).attr("d"))[1] : d3.select(this).attr("d");
 				newArc = newArc.replace(/,/g , " ");
 
 				svg.append("path")
@@ -224,14 +224,6 @@ var createDonutChart = function (dataSet, colourRange, chartSelector) {
 
 	restOfTheData();
 };
-
-var genNumber = (function () {
-	var counter = 0;
-
-	return function () {
-		return counter++;
-	};
-})();
 
 var createBarChart = function (dataSet, chartSelector) {
 	var width = 300;
@@ -359,32 +351,39 @@ var createBarChart = function (dataSet, chartSelector) {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-	[].concat(d3.selectAll("#stepsChart").attr("data-index")).map(function (index) {
-		var stepsData = JSON.parse(d3.selectAll("#stepsChart").attr("data-chart"))[index];
+	var stepsChart = d3.selectAll("#stepsChart");
+	stepsChart[0].map(function (chart, index, array) {
+		array[index].id = "stepsChart" + index;
+			
+		var stepsData = JSON.parse(d3.select(chart).attr("data-chart"))[index];
 		document.getElementsByClassName("chart-header steps-donut-chart")[index].innerHTML = "Steps (Total: " + stepsData.all + ")";
 		createDonutChart([
 			{ name: "Passing", count: stepsData.passed, id: 0, color: "#96FA96" },
 			{ name: "Failing", count: stepsData.failed, id: 1, color: "#FA9696" },
 			{ name: "Skipped", count: stepsData.skipped, id: 2, color: "#FAFA96" }
-		], ["#96FA96", "#FA9696", "#FAFA96"], "#stepsChart");
+		], ["#96FA96", "#FA9696", "#FAFA96"], "#stepsChart" + index);
 
-		document.getElementById("steps-all").innerHTML = stepsData.all;
-		document.getElementById("steps-passed").innerHTML = stepsData.passed;
-		document.getElementById("steps-failed").innerHTML = stepsData.failed;
-		document.getElementById("steps-skipped").innerHTML = stepsData.skipped;
+		document.getElementsByClassName("steps-all")[index].innerHTML = stepsData.all;
+		document.getElementsByClassName("steps-passed")[index].innerHTML = stepsData.passed;
+		document.getElementsByClassName("steps-failed")[index].innerHTML = stepsData.failed;
+		document.getElementsByClassName("steps-skipped")[index].innerHTML = stepsData.skipped;
 	});
 
-	[].concat(d3.selectAll("#scenariosChart").attr("data-index")).map(function (index) {
-		var scenariosData = JSON.parse(d3.selectAll("#scenariosChart").attr("data-chart"))[index];
+	var scenariosChart = d3.selectAll("#scenariosChart");
+	scenariosChart[0].map(function (chart, index, array) {
+		array[index].id = "scenariosChart" + index;
+		
+		var scenariosData = JSON.parse(d3.select(chart).attr("data-chart"))[index];
 		document.getElementsByClassName("chart-header scenarios-donut-chart")[index].innerHTML = "Scenarios (Total: " + scenariosData.all + ")";
+		
 		createDonutChart([
 			{ name: "Passing", count: scenariosData.passed, id: 3, color: "#96FA96" },
 			{ name: "Failing", count: scenariosData.failed, id: 4, color: "#FA9696" }
-		], ["#96FA96", "#FA9696"], "#scenariosChart");
+		], ["#96FA96", "#FA9696"], "#scenariosChart" + index);
 
-		document.getElementById("scenarios-all").innerHTML = scenariosData.all;
-		document.getElementById("scenarios-passed").innerHTML = scenariosData.passed;
-		document.getElementById("scenarios-failed").innerHTML = scenariosData.failed;
+		document.getElementsByClassName("scenarios-all")[index].innerHTML = scenariosData.all;
+		document.getElementsByClassName("scenarios-passed")[index].innerHTML = scenariosData.passed;
+		document.getElementsByClassName("scenarios-failed")[index].innerHTML = scenariosData.failed;
 	});
 	
 	var barCharts = d3.selectAll("#stepsBarChart");
