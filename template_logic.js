@@ -130,12 +130,12 @@ var createDonutChart = function (dataSet, colourRange, chartSelector) {
 		};
 	};
 
-	var mainChart = createChart(svg, outerRadiusArc, innerRadiusArc, function (d) {
+	createChart(svg, outerRadiusArc, innerRadiusArc, function (d) {
 		var darkened = d3.hsl(color(d.data.name));
 		return d3.hsl((darkened.h + 5), (darkened.s - 0.07), (darkened.l - 0.15));
 	}, "path0");
 
-	var shadowChart = createChart(svg, outerRadiusArcShadow, innerRadiusArcShadow, function(d) {
+	createChart(svg, outerRadiusArcShadow, innerRadiusArcShadow, function(d) {
 		var darkened = d3.hsl(color(d.data.name));
 		return d3.hsl((darkened.h + 10), (darkened.s - 0.14), (darkened.l - 0.3));
 	}, "path1");
@@ -174,23 +174,6 @@ var createDonutChart = function (dataSet, colourRange, chartSelector) {
 			});
 	
 	//Add text
-
-	function numberWithCommas(x) {
-		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-	}
-
-	var addText = function (text, y, size) {
-		svg.append("text")
-			.text(text)
-			.attr({
-				"text-anchor": "middle",
-				"y": y
-			})
-			.style({
-				"fill": "#000000",
-				"font-size": size
-			});
-	};
 
 	var restOfTheData = function () {
 
@@ -349,6 +332,144 @@ var createBarChart = function (dataSet, chartSelector) {
 		});
 };
 
+var createLayeredBarChart = function (dataSet, chartSelector, colorRange) {
+	var width = 300;
+	var height = 250;
+	var barPadding = 20;
+	var maxWidth = 70;
+
+	var svg = d3.select(chartSelector)
+		.append("svg")
+		.attr("width", width + 130)
+		.attr("height", height);
+
+	for (var j = 0; j < dataSet.length; j++) {
+
+		var previousHeight = 0;
+		svg.selectAll(".rect")
+			.data(dataSet[j])
+			.enter()
+			.append("rect")
+			.attr("x", function () {
+				return j * width / dataSet.length;
+			})
+			.attr("y", function (d) {
+				var cache = previousHeight;
+				var total = 0;
+				for (var i = 0; i < dataSet[j].length; i++) {
+					total += dataSet[j][i].count;
+				}
+
+				previousHeight += (d.count / total) * height;
+				return cache;
+			})
+			.attr("width", Math.min(width / dataSet.length - (barPadding + 10), maxWidth))
+			.attr("height", function (d) {
+				var total = 0;
+				for (var i = 0; i < dataSet[j].length; i++) {
+					total += dataSet[j][i].count;
+				}
+
+				return (d.count / total) * height;
+			})
+			.attr("fill", function (d) {
+				var color = d3.hsl(d.color);
+				return d3.hsl((color.h + 5), (color.s - 0.07), (color.l - 0.15));
+			});
+
+		previousHeight = 0;
+		svg.selectAll(".rect-shadow")
+			.data(dataSet[j])
+			.enter()
+			.append("rect")
+			.attr("x", function () {
+				return j * width / dataSet.length + Math.min(width / dataSet.length - (barPadding + 10), maxWidth);
+			})
+			.attr("y", function (d) {
+				var cache = previousHeight;
+				var total = 0;
+				for (var i = 0; i < dataSet[j].length; i++) {
+					total += dataSet[j][i].count;
+				}
+
+				previousHeight += (d.count / total) * height;
+				return cache;
+			})
+			.attr("width", 10)
+			.attr("height", function (d) {
+				var total = 0;
+				for (var i = 0; i < dataSet[j].length; i++) {
+					total += dataSet[j][i].count;
+				}
+
+				return (d.count / total) * height;
+			})
+			.attr("fill", function (d) {
+				var color = d3.hsl(d.color);
+				return d3.hsl((color.h + 10), (color.s - 0.14), (color.l - 0.3));
+			});
+
+		previousHeight = 0;
+		svg.selectAll(".text")
+			.data(dataSet[j])
+			.enter()
+			.append("text")
+			.text(function (d) {
+				var total = 0;
+				for (var i = 0; i < dataSet[j].length; i++) {
+					total += dataSet[j][i].count;
+				}
+
+				return round((d.count / total) * 100, 2) + "%";
+			})
+			.attr("x", function () {
+						return j * width / dataSet.length + Math.min(width / dataSet.length - (barPadding + 10), maxWidth) * 0.20;
+			})
+			.attr("y", function (d) {
+				var cache = previousHeight + 16;
+				var total = 0;
+				for (var i = 0; i < dataSet[j].length; i++) {
+					total += dataSet[j][i].count;
+				}
+
+				previousHeight += (d.count / total) * height;
+				return cache;
+			});
+	}
+
+	var legendRectSize = 18;
+	var legendSpacing = 4;
+	var legend = svg.selectAll(".legend")
+		.data(dataSet)
+		.enter()
+		.append("g")
+		.attr("class", "legend")
+		.attr("transform", function (d, i) {
+			var height = legendRectSize + legendSpacing;
+			var y = i * height;
+			return "translate(" + 320 + "," + y + ")";
+		});
+
+	legend.append("rect")
+		.attr("width", legendRectSize)
+		.attr("height", legendRectSize)
+		.style("fill", function (d, i) {
+			var color = d3.hsl(d[i].color);
+			return d3.hsl((color.h + 5), (color.s - 0.07), (color.l - 0.15));
+		})
+		.style("stroke", function (d, i) {
+			var color = d3.hsl(d[i].color);
+			return d3.hsl((color.h + 5), (color.s - 0.07), (color.l - 0.15));
+		});
+	
+	legend.append("text")
+		.attr("x", legendRectSize + legendSpacing)
+		.attr("y", legendRectSize - legendSpacing)
+		.text(function (d, i) {
+			return d[i].name;
+		});
+};
+
 document.addEventListener("DOMContentLoaded", function () {
 
 	var stepsChart = d3.selectAll("#stepsChart");
@@ -405,6 +526,22 @@ document.addEventListener("DOMContentLoaded", function () {
 			{ name: "Failing", count: stepsBarData.failed, color: "#FA9696" },
 			{ name: "Skipped", count: stepsBarData.skipped, color: "#FAFA96" }
 		], "#stepsBarChart" + index);
+
+	});
+
+	var layeredBarCharts = d3.selectAll("#tagsBarChart");
+	layeredBarCharts[0].map(function (chart, index, array) {
+		array[index].id = "tagsBarChart" + index;
+
+		var tagsBarData = JSON.parse(d3.select(chart).attr("data-chart")).map(function (tag) {
+			return [
+				{ name: "Passing", count: tag.steps.passed, color: "#96FA96" },
+				{ name: "Failing", count: tag.steps.failed, color: "#FA9696" },
+				{ name: "Skipped", count: tag.steps.skipped, color: "#FAFA96" }
+			]
+		});
+
+		createLayeredBarChart(tagsBarData, "#tagsBarChart" + index, ["#96FA96", "#FA9696", "#FAFA96"]);
 
 	});
 

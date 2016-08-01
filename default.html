@@ -166,6 +166,56 @@
         {{/elements}}
       </div>
       {{/features}}
+
+      <div class="report">
+        <h2>Tags statistics</h2>
+
+        <div class="chart-body">
+          <div class="widget">
+            <div id="tagsBarChart" data-chart="{{tagsJson}}" class="chart-container"></div>
+          </div>
+        </div>
+
+        <div class="summary-table">
+          <table>
+            <tr class="main-header">
+              <th>Tags</th>
+              <th colspan="3">Scenarios</th>
+              <th colspan="4">Steps</th>
+              <th colspan="2"></th>
+            </tr>
+            <tr class="sub-header">
+              <th></th>
+              <th>Total</th>
+              <th>Passed</th>
+              <th>Failed</th>
+              <th>Total</th>
+              <th>Passed</th>
+              <th>Failed</th>
+              <th>Skipped</th>
+              <th>Duration</th>
+              <th>Status</th>
+            </tr>
+
+            {{#tags}}
+            <tr class="{{status}}">
+              <td>{{name}}</td>
+              <td class="scenarios-all">{{scenarios.all}}</td>
+              <td class="scenarios-passed passed">{{scenarios.passed}}</td>
+              <td class="scenarios-failed failed">{{scenarios.failed}}</td>
+              <td class="steps-all">{{steps.all}}</td>
+              <td class="steps-passed passed">{{steps.passed}}</td>
+              <td class="steps-failed failed">{{steps.failed}}</td>
+              <td class="steps-skipped skipped">{{steps.skipped}}</td>
+              <td class="duration">{{duration}}</td>
+              <td class="status">{{status}}</td>
+            </tr>
+            {{/tags}}
+
+          </table>
+        </div>
+      </div>
+
     </div>
 
     <div class="screenshots">

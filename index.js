@@ -11,7 +11,7 @@ var day = date.getDate();
 var name = "report_".concat(year, month, day, "_", hour, minutes, seconds, ".html");
 
 var options = {
-  source:     "./report.json",     // source json
+  source:     "./cucumber_report.json",     // source json
   dest:       "./reports",                  // target directory (will create if not exists)
   name:       name,                         // report file name (will be index.html if not exists)
   template:   "default.html",               // your custom mustache template (uses default if not specified)
