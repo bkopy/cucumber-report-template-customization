@@ -155,7 +155,9 @@ CucumberHtmlReport.prototype.createReport = function() {
   //Replaces "OK" and "NOK" with "Passed" and "Failed".
   summary.status = summary.status === "OK" ? "passed" : "failed";
 
-  var logo = "data:image/svg+xml;base64," + getDataUri(options.logo);
+  var logoExtension = options.logo.split(".").pop();
+  var logo = "data:image/" + (logoExtension === "svg" ? "svg+xml" : logoExtension) + ";base64," + getDataUri(options.logo);
+  
   var screenshots = fs.readdirSync("./screenshots").map(function (file) {
     if (file[0] === ".") {
       return undefined;
