@@ -8,6 +8,10 @@ var
   Summary = require("./node_modules/cucumber-html-report/lib/summary.js"),
   R = require("ramda");
 
+if (!Object.assign) {
+  Object.assign = require("object-assign");
+}
+
 /**
  * Rouds a number to the supplied decimals. Only makes sense for floats!
  * @param decimals The maximum number of decimals expected.
