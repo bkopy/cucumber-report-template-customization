@@ -14,6 +14,7 @@
     "cucumber-html-report": "^0.3.8",
     "d3": "^3.5.5",
     "mustache": "^2.2.1",
+    "object-assign": "^4.1.0",
     "ramda": "^0.21.0",
     "slug": "^0.9.1",
     "webpack": "^1.13.1"
