@@ -17,7 +17,8 @@ var options = {
   template:   "extended_template.html",               // your custom mustache template (uses default if not specified)
   title:      "Cucumber Report",            // Title for default template. (default is Cucumber Report)
   component:  "My Component",               // Subtitle for default template. (default is empty)
-  logo:       "./logos/cucumber-logo.svg"  // Path to the displayed logo.
+  logo:       "./logos/cucumber-logo.svg",  // Path to the displayed logo.
+  screenshots:       "./screenshots"  // Path to the directory of screenshots.
 };
 
 var report = new Report(options);
