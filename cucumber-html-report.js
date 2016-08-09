@@ -172,7 +172,7 @@ CucumberHtmlReport.prototype.createReport = function() {
     extension === "svg" ? extension = "svg+xml" : false;
     return {
       name: name.join(".").replace(/\s/, "_"),
-      url: "data:image/" + extension + ";base64," + getDataUri("./screenshots/" + file)
+      url: "data:image/" + extension + ";base64," + getDataUri(options.screenshots + "/" + file)
     };
   }).filter(function (image) {
     return image;
