@@ -162,7 +162,7 @@ CucumberHtmlReport.prototype.createReport = function() {
   var logoExtension = options.logo.split(".").pop();
   var logo = "data:image/" + (logoExtension === "svg" ? "svg+xml" : logoExtension) + ";base64," + getDataUri(options.logo);
   
-  var screenshots = fs.readdirSync("./screenshots").map(function (file) {
+  var screenshots = fs.readdirSync(options.screenshots).map(function (file) {
     if (file[0] === ".") {
       return undefined;
     }
