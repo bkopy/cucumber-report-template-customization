@@ -27,7 +27,7 @@ function getDataUri(file) {
   return new Buffer(bitmap).toString("base64");
 }
 
-var defaultTemplate = path.join(__dirname, "templates", "default.html");
+var defaultTemplate = path.join(__dirname, "templates", "sample.html");
 
 var CucumberHtmlReport = module.exports = function(options) {
   this.options = options || {};
