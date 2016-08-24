@@ -3,14 +3,12 @@
 var replace = require("replace");
 var fs      = require("fs");
 
-class templateBuilder {
+function templateBuilder(report, options) {
 
-    constructor(report, options) {
-        this.report = report || undefined;
-        this.template = './' + this.report.options.template  || './extended_template.html';
-    }
+    this.report = report || undefined;
+    this.template = './' + this.report.options.template  || './extended_template.html';
 
-    renderTemplate() {
+    this.renderTemplate = function() {
         let self = this;
         fs.readFile('./src/grid.html', 'utf8', function (err,data) {
             if (err) return console.log(err);
@@ -27,7 +25,7 @@ class templateBuilder {
         });
     }
 
-    parseCss() {
+    this.parseCss = function() {
         let self = this;
         return new Promise(function (resolve, reject) {
             fs.readFile('./src/styles.css', 'utf8', function (err,data) {
@@ -46,7 +44,7 @@ class templateBuilder {
         });
     }
 
-    parseHtml() {
+    this.parseHtml = function() {
         let self = this;
         return new Promise(function (resolve, reject) {
             fs.readFile('./src/template.html', 'utf8', function (err,data) {   
@@ -65,7 +63,7 @@ class templateBuilder {
         });
     }
 
-    parseJS() {
+    this.parseJS = function() {
         let self = this;
         return new Promise(function (resolve, reject) {
 
@@ -94,7 +92,7 @@ class templateBuilder {
         });
     }
 
-    createReport(report) {
+    this.createReport = function(report) {
         if(typeof report !== 'undefined') {
             report.createReport();
         }
