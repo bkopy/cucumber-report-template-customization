@@ -8,8 +8,9 @@ function templateBuilder(report, options) {
     this.report = report || undefined;
     this.template = './' + this.report.options.template  || './extended_template.html';
 
+
     this.renderTemplate = function() {
-        let self = this;
+        var self = this;
         fs.readFile('./src/grid.html', 'utf8', function (err,data) {
             if (err) return console.log(err);
 
@@ -26,7 +27,7 @@ function templateBuilder(report, options) {
     }
 
     this.parseCss = function() {
-        let self = this;
+        var self = this;
         return new Promise(function (resolve, reject) {
             fs.readFile('./src/styles.css', 'utf8', function (err,data) {
                 if (err) reject(err);
@@ -45,7 +46,7 @@ function templateBuilder(report, options) {
     }
 
     this.parseHtml = function() {
-        let self = this;
+        var self = this;
         return new Promise(function (resolve, reject) {
             fs.readFile('./src/template.html', 'utf8', function (err,data) {   
                 if (err) reject(err);
@@ -64,11 +65,11 @@ function templateBuilder(report, options) {
     }
 
     this.parseJS = function() {
-        let self = this;
+        var self = this;
         return new Promise(function (resolve, reject) {
 
-            let jsData = '';
-            let readStream = fs.createReadStream('./app.js');
+            var jsData = '';
+            var readStream = fs.createReadStream('./app.js');
 
             readStream
                 .on('data', function (chunk) {
